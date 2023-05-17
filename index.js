@@ -1,51 +1,27 @@
-const http = require('http');
-const app = require('express');
-const fs = require('fs');
+const express = require('express');
 
-const server = http.createServer((req, res) => {
-  // Set header content type
-  res.setHeader('Content-Type', 'text/html');
+// Create an instance of express app
+const app = express();
 
-  let path = './views/';
+// Listen for requests
+app.listen(8000);
 
-  switch (req.url) {
-    case '/': {
-      path += 'index.html';
-      res.statusCode = 200;
-      break;
-    }
-    case '/about': {
-      path += 'about.html';
-      res.statusCode = 200;
-      break;
-    }
-    case '/contact': {
-      path += 'contact-me.html';
-      res.statusCode = 200;
-      break;
-    }
-    case '/contact-me': {
-      res.statusCode = 301;
-      res.setHeader('Location', '/contact');
-      res.end();
-      break;
-    }
-    default: {
-      path += '404.html';
-      res.statusCode = 404;
-      break;
-    }
-  }
-
-  //   Read and send html data
-  fs.readFile(path, (err, data) => {
-    if (err) {
-      console.log(err);
-      res.end();
-    } else {
-      res.end(data);
-    }
-  });
+app.get('/', (req, res) => {
+  res.sendFile('./views/index.html', { root: __dirname });
 });
 
-server.listen(8000);
+app.get('/about', (req, res) => {
+  res.sendFile('./views/about.html', { root: __dirname });
+});
+
+app.get('/contact', (req, res) => {
+  res.sendFile('./views/contact-me.html', { root: __dirname });
+});
+
+app.get('/contact-me', (req, res) => {
+  res.redirect('/contact');
+});
+
+app.use((req, res) => {
+  res.status(404).sendFile('./views/404.html', { root: __dirname });
+});
